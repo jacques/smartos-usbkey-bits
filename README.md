@@ -31,7 +31,7 @@ Use is subject to license terms.
 
 ## TODO
 
-[ ] Download USB Key Images from manta for July 2013 or later builds.
+ * [x] Download USB Key Images from manta for July 2013 or later builds.
 
 ## Contact
 
