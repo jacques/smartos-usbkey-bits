@@ -54,11 +54,29 @@ if [[ $(echo ${IMAGE} | cut -c 1-6) -ge 201307 ]]; then
     echo "Unable to download the SmartOS ${IMAGE} USB Key build from Manta."
     exit 2
   fi
+
+  #
+  # Check md5 hash of the image
+  #
+  md5=$(curl -k -s https://us-east.manta.joyent.com/Joyent_Dev/public/SmartOS/${IMAGE}/md5sums.txt | grep "smartos-${IMAGE}-USB.img.bz2$" | cut -d' ' -f 1)
+  if [[ $md5 != $(openssl dgst -md5 smartos-${IMAGE}-USB.img.bz2 | awk '{ print $2 }') ]]; then
+    echo "md5 hash for smartos-${IMAGE}-USB.img.bz2 does not match."
+    exit 1
+  fi
 else
   wget --no-check-cert https://download.joyent.com/pub/iso/smartos-${IMAGE}-USB.img.bz2
   if [ $? -eq 1 ]; then
     echo "Unable to download the SmartOS ${IMAGE} USB Key build from download.joyent.com."
     exit 2
+  fi
+
+  #
+  # Check md5 hash of the image
+  #
+  md5=$(curl -k -s https://download.joyent.com/pub/iso/md5sums.txt | grep "smartos-${IMAGE}-USB.img.bz2$" | cut -d' ' -f 1)
+  if [[ $md5 != $(openssl dgst -md5 smartos-${IMAGE}-USB.img.bz2 | awk '{ print $2 }') ]]; then
+    echo "md5 hash for smartos-${IMAGE}-USB.img.bz2 does not match."
+    exit 1
   fi
 fi
 
