@@ -1,10 +1,8 @@
 # SmartOS USB Key Bits
-======================
 
 These scripts are some scripts I use to maintain USB Keys on SmartOS nodes.
 
 ## License
-----------
 
 ```
 CDDL HEADER START
@@ -30,3 +28,15 @@ CDDL HEADER END
 Copyright 2013 Jacques Marneweck.  All rights reserved.
 Use is subject to license terms.
 ```
+
+## TODO
+
+[ ] Download USB Key Images from manta for July 2013 or later builds.
+
+## Contact
+
+ * jacques {at} powertrip {dot} co {dot} za
+ * [@jacques](http://twitter.com/jacques) on twitter
+ * <http://www.powertrip.co.za/> personal website
+ * <http://www.powertrip.co.za/blog/> personal blog
+ * <http://www.siberia.co.za/> consultancy website
