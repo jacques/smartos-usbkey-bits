@@ -86,7 +86,7 @@ if [ $? -eq 1 ]; then
   exit 3
 fi
 
-drives=$(/usr/bin/rmformat | /usr/bin/grep "/dev/rdsk/" | /usr/bin/awk '{ print $4 }')
+drives=$(diskinfo -H | nawk 'BEGIN { FS = "[\t]*|[\t]+" } { if ($6 == "yes" && $1 == "USB") print $2 }')
 for drive in ${drives[@]}
 do
   echo "Writing to ${drive}"
