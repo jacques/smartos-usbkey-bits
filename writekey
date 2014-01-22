@@ -20,7 +20,7 @@
 #
 # CDDL HEADER END
 #
-# Copyright 2013 Jacques Marneweck.  All rights reserved.
+# Copyright 2013-2014 Jacques Marneweck.  All rights reserved.
 # Use is subject to license terms.
 #
 # Fetches SmartOS Platform Image and writes them to the usbkey
@@ -89,6 +89,8 @@ fi
 drives=$(diskinfo -H | nawk 'BEGIN { FS = "[\t]*|[\t]+" } { if ($6 == "yes" && $1 == "USB") print $2 }')
 for drive in ${drives[@]}
 do
-  echo "Writing to ${drive}"
-  dd if=/var/tmp/usbimg/smartos-${IMAGE}-USB.img  of=${drive} bs=1024k
+  if [[ `/usr/sbin/fstyp /dev/dsk/${drive}p0:1` == 'pcfs' ]]; then
+    echo "Writing to ${drive}"
+    dd if=/var/tmp/usbimg/smartos-${IMAGE}-USB.img  of=/dev/rdsk/${drive}p0 bs=1024k
+  fi
 done
