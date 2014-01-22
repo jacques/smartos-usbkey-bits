@@ -25,7 +25,7 @@ information: Portions Copyright [yyyy] [name of copyright owner]
 
 CDDL HEADER END
 
-Copyright 2013 Jacques Marneweck.  All rights reserved.
+Copyright 2013-2014 Jacques Marneweck.  All rights reserved.
 Use is subject to license terms.
 ```
 
