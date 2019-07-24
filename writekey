@@ -20,7 +20,7 @@
 #
 # CDDL HEADER END
 #
-# Copyright 2013-2014 Jacques Marneweck.  All rights reserved.
+# Copyright 2013-2019 Jacques Marneweck.  All rights reserved.
 # Use is subject to license terms.
 #
 # Fetches SmartOS Platform Image and writes them to the usbkey
@@ -46,9 +46,25 @@ cd /var/tmp/usbimg
 
 #
 # Download July 2013 and later releases from Manta in us-east-1
-# else from download.joyent.com for older builds.
+# else from download.joyent.com for older builds.  Builds starting
+# in April 2019 are compressed with gzip.
 #
-if [[ $(echo ${IMAGE} | cut -c 1-6) -ge 201307 ]]; then
+if [[ $(echo ${IMAGE} | cut -c 1-6) -ge 201904 ]]; then
+  wget --no-check-cert https://us-east.manta.joyent.com/Joyent_Dev/public/SmartOS/${IMAGE}/smartos-${IMAGE}-USB.img.gz
+  if [ $? -eq 1 ]; then
+    echo "Unable to download the SmartOS ${IMAGE} USB Key build from Manta."
+    exit 2
+  fi
+
+  #
+  # Check md5 hash of the image
+  #
+  md5=$(curl -k -s https://us-east.manta.joyent.com/Joyent_Dev/public/SmartOS/${IMAGE}/md5sums.txt | grep "smartos-${IMAGE}-USB.img.gz$" | cut -d' ' -f 1)
+  if [[ $md5 != $(openssl dgst -md5 smartos-${IMAGE}-USB.img.gz | awk '{ print $2 }') ]]; then
+    echo "md5 hash for smartos-${IMAGE}-USB.img.gz does not match."
+    exit 1
+  fi
+elif [[ $(echo ${IMAGE} | cut -c 1-6) -ge 201307 ]]; then
   wget --no-check-cert https://us-east.manta.joyent.com/Joyent_Dev/public/SmartOS/${IMAGE}/smartos-${IMAGE}-USB.img.bz2
   if [ $? -eq 1 ]; then
     echo "Unable to download the SmartOS ${IMAGE} USB Key build from Manta."
@@ -80,13 +96,17 @@ else
   fi
 fi
 
-bunzip2 smartos-${IMAGE}-USB.img.bz2
+if [[ $(echo ${IMAGE} | cut -c 1-6) -ge 201904 ]]; then
+  gunzip smartos-${IMAGE}-USB.img.gz
+else
+  bunzip2 smartos-${IMAGE}-USB.img.bz2
+fi
 if [ $? -eq 1 ]; then
-  echo "Cannot unzip usb image."
+  echo "Cannot inflate the usb image."
   exit 3
 fi
 
-drives=$(diskinfo -H | nawk 'BEGIN { FS = "[\t]*|[\t]+" } { if ($6 == "yes" && $1 == "USB") print $2 }')
+drives=$(diskinfo -H | nawk 'BEGIN { FS = "[\t]*|[\t]+" } { if ($6 == "yes" && ($1 == "USB" || $1 == "SCSI")) print $2 }')
 for drive in ${drives[@]}
 do
   if [[ `/usr/sbin/fstyp /dev/dsk/${drive}p0:1` == 'pcfs' ]]; then
